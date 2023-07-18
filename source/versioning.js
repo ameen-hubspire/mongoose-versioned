@@ -281,7 +281,8 @@ module.exports = function (schema, options) {
             return foundBase})
 
         let bV = base[constants.VERSION]
-        if (baseVersion !== bV) {
+       
+        if (baseVersion !== bV && base[constants.VERSION]!=undefined) {
             let err = new Error('modified and base versions do not match')
             throw (err)
         }
@@ -298,13 +299,21 @@ module.exports = function (schema, options) {
 
         // Set validity to end now for versioned and to start now for current
         const now = new Date()
-        const start = base[constants.VALIDITY]["start"]
-
+       
+        let start 
+        //= base[cons tants.VALIDITY]!=undefined ? base[constants.VALIDITY]["start"]:base[constants.VALIDITY].start=now;
+        if (base[constants.VALIDITY] != undefined) {
+            start = base[constants.VALIDITY]["start"];
+          } else {
+            base[constants.VALIDITY] = {};
+            start = now;
+          }
+        
         clone[constants.VALIDITY] = {
             "start": start,
             "end": now
         }
-
+     
         this[constants.VALIDITY] = { "start": now }
 
         // Special case for the findAndDelete to include deleter information
@@ -341,7 +350,7 @@ module.exports = function (schema, options) {
         clone[constants.ID] = { [constants.ID]: this[constants.ID], [constants.VERSION]: this[constants.VERSION] }
 
         const now = new Date()
-        const start = this[constants.VALIDITY]["start"]
+        const start = this[constants.VALIDITY]["start"] != undefined?this[constants.VALIDITY]["start"]:null;
         clone[constants.VALIDITY] = {
             "start": start,
             "end": now
